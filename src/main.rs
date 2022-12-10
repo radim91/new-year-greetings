@@ -5,7 +5,7 @@ use serde_json::Value;
 
 fn main() {
     let next_year: i32 = Utc::now().year() + 1;
-    let unsplash_uri = SearchPhotos::new("JRzZBQwAW24--mdyrlbWwJfIxcuxfsCSlCQNKSDeN4E", "christmas")
+    let unsplash_uri = SearchPhotos::new("JRzZBQwAW24--mdyrlbWwJfIxcuxfsCSlCQNKSDeN4E", "new year")
         .render_request()
         .unwrap()
         .uri()
