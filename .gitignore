@@ -1,2 +1,4 @@
 /target
 .idea
+/downloads/*
+!/downloads/.gitkeep
