@@ -1,9 +1,12 @@
+use std::path::Path;
 use chrono::prelude::*;
 use unsplash_api::endpoints::search_photos::SearchPhotos;
 use http_api_client_endpoint::Endpoint;
 use serde_json::Value;
 use image::ImageFormat;
 use random_string::generate;
+use imageproc::drawing;
+use rusttype::{Font, Scale};
 
 fn main() {
     let next_year: i32 = Utc::now().year() + 1;
@@ -27,13 +30,21 @@ fn main() {
             }
 
             let res = reqwest::blocking::get(&link).unwrap().bytes();
-            let downloaded_image = image::load_from_memory(&res.unwrap()).unwrap();
+            let mut downloaded_image = image::load_from_memory(&res.unwrap()).unwrap();
             let random_string = generate(10, "abcdefghijklmnopqrstuvwxyz1234567890");
-            let path = format!("./downloads/image-{}.png", random_string);
+            let path_str = format!("./downloads/image-{}.png", random_string);
+            let path = Path::new(&path_str);
 
-            downloaded_image.save_with_format(path, ImageFormat::Png);
+            const TEXT_COLOR: image::Rgba<u8> = image::Rgba([255,255,255,8]);
+            let scale_main: Scale = rusttype::Scale::uniform(80.0);
+            let scale_sub: Scale = rusttype::Scale::uniform(40.0);
+            let greeting_main = format!("HAPPY NEW YEAR {}", next_year);
+            let greeting_sub = "from EAT CZECH";
+            let font: &Font = &rusttype::Font::try_from_bytes(std::include_bytes!("../fonts/Roboto-Black.ttf")).unwrap();
+
+            drawing::draw_text_mut(&mut downloaded_image, TEXT_COLOR, 40, 40, scale_main, &font, &greeting_main);
+            drawing::draw_text_mut(&mut downloaded_image, TEXT_COLOR, 40, 120, scale_sub, font, greeting_sub);
+            downloaded_image.save_with_format(path, ImageFormat::Png).unwrap();
         }
     }
-
-    println!("{}", next_year);
 }
