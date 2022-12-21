@@ -7,8 +7,19 @@ use image::ImageFormat;
 use random_string::generate;
 use imageproc::drawing;
 use rusttype::{Font, Scale};
+use std::env;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    let mut author: String = String::from("EAT CZECH");
+
+    if &args.len() > &1 {
+        author = String::new();
+        for arg in &args[1..] {
+            author.push_str(arg);
+        }
+    }
+
     let next_year: i32 = Utc::now().year() + 1;
     let unsplash_uri = SearchPhotos::new("JRzZBQwAW24--mdyrlbWwJfIxcuxfsCSlCQNKSDeN4E", "new year")
         .render_request()
@@ -39,11 +50,11 @@ fn main() {
             let scale_main: Scale = rusttype::Scale::uniform(80.0);
             let scale_sub: Scale = rusttype::Scale::uniform(40.0);
             let greeting_main = format!("HAPPY NEW YEAR {}", next_year);
-            let greeting_sub = "from EAT CZECH";
+            let greeting_sub = format!("from {}", author);
             let font: &Font = &rusttype::Font::try_from_bytes(std::include_bytes!("../fonts/Roboto-Black.ttf")).unwrap();
 
             drawing::draw_text_mut(&mut downloaded_image, TEXT_COLOR, 40, 40, scale_main, &font, &greeting_main);
-            drawing::draw_text_mut(&mut downloaded_image, TEXT_COLOR, 40, 120, scale_sub, font, greeting_sub);
+            drawing::draw_text_mut(&mut downloaded_image, TEXT_COLOR, 40, 120, scale_sub, font, &greeting_sub);
             downloaded_image.save_with_format(path, ImageFormat::Png).unwrap();
         }
     }
